@@ -1,37 +1,29 @@
 import pickle
-import numpy as np 
+from typing import Generic, TypeVar
+
+import numpy as np
+
+T = TypeVar("T")
 
 
-class LocalizationModel:
+class LocalizationModel(Generic[T]):
     def __init__(self):
-        pass 
+        # TODO
+        pass
 
-    def train(self, x, y, *args, **kwargs):
-        self.x = x 
-        self.y = y
-        pass 
+    def train(self, x, y: T, *args, **kwargs):
+        # TODO
+        pass
 
-    def predict(self, x, *args, **kwargs):
-        # 1-kNN
-        minval = np.nanmin(self.x) 
-
-        train_x = self.x.copy() 
-
-        train_x[np.isnan(train_x)] = minval
-
-        x[np.isnan(x)] = minval
-
-
-        dists = np.linalg.norm(train_x - np.tile(x, (train_x.shape[0], 1)), axis=1)
-        min_ind = np.argmin(dists) 
-
-        return self.y[min_ind].squeeze() 
+    def predict(self, x, *args, **kwargs) -> T:
+        # TODO
+        pass
 
     def save_model(self, model_path: str):
-        with open(model_path, 'wb') as f:
-            pickle.dump(self, f) 
+        with open(model_path, "wb") as f:
+            pickle.dump(self, f)
 
-    @staticmethod  
+    @staticmethod
     def load_model(model_path: str):
-        with open(model_path, 'rb') as f:
-            return pickle.load(f) 
+        with open(model_path, "rb") as f:
+            return pickle.load(f)
