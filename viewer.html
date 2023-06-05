@@ -64,7 +64,7 @@
         React.useEffect(() => {
           const interval = setInterval(() => {
             axios
-              .get("http://localhost:5001/y")
+              .get("http://YOUR_IP:5001/data.json")
               .then((response) => {
                 console.log(response.data);
                 if (!response.data) {

@@ -1,3 +1,4 @@
+import json
 import argparse
 import asyncio
 import os
@@ -54,7 +55,10 @@ async def on_receive_scan_data(scan_result: ScanResult, uuid_list: List[str], mo
     #
     #    y = y_def.y_def[list(y_def.y_def.keys())[random.randint(0, 3)]]
 
-    current_prediction["y"] = y
+    current_prediction["y"] = str(int(y))
+
+    with open("./data.json", "w") as f:
+        json.dump(current_prediction, f)
 
 
 def real_main(args, event):
@@ -62,7 +66,7 @@ def real_main(args, event):
         loop = asyncio.get_event_loop()
     except RuntimeError:
         loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+        #asyncio.set_event_loop(loop)
 
     with open("uuid_list.pkl", "rb") as f:
         uuid_list = pickle.load(f)
@@ -105,6 +109,7 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    threading.Thread(target=real_main, args=(args, event)).start()
+    # threading.Thread(target=real_main, args=(args, event)).start()
+    real_main(args, event)
 
-    app.run(host="localhost", port=5001)
+    #app.run(host="localhost", port=5001)
