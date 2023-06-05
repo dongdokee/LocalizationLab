@@ -71,43 +71,29 @@
                   return;
                 }
 
-                let y = null;
-                if (response.data.y) {
-                  somey = response.data.y.toString();
-                  if (somey.indexOf(",") !== -1) {
-                    ydefkeys = Object.keys(response.data.ydef);
-                    ydefkeys.forEach((ydefkey) => {
-                      ydefval = response.data.ydef[ydefkey].join(",");
-                      if (somey.indexOf(ydefval) !== -1) {
-                        y = ydefkey;
-                      }
-                    });
-                  } else {
-                    y = somey;
-                  }
-                }
+                let y = response.data.y;
 
                 let node = <div></div>;
                 if (y) {
-                  const yval2 = response.data.ydef[y];
+                  const yval2 = y;
                   if (yval2.length === 2) {
-                    return (
+                    node = (
                       <div>
                         <div
                           style={{
                             position: "absolute",
                             left: yval2[0] * 600,
                             top: yval2[1] * 600,
-                            width: 10,
-                            height: 10,
+                            width: 20,
+                            height: 20,
                             backgroundColor: "green",
-                            borderRadius: 5,
+                            borderRadius: 10,
                           }}
                         ></div>
                       </div>
                     );
                   } else if (yval2.length === 4) {
-                    return (
+                    node = (
                       <div>
                         <div
                           style={{

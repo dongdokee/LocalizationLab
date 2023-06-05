@@ -50,7 +50,9 @@ async def on_receive_scan_data(scan_result: ScanResult, uuid_list: List[str], mo
     # y = perform_localization(fingerprint, model)
     import random
 
-    y = y_def.y_def[random.randint(0, 3)]
+    print("on_receive_scan_data", flush=True)
+
+    y = y_def.y_def[list(y_def.y_def.keys())[random.randint(0, 3)]]
 
     current_prediction["y"] = y
 
