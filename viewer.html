@@ -59,12 +59,121 @@
 
       function App() {
         const [currentY, setCurrentY] = React.useState("");
+        const [currentNode, setCurrentNode] = React.useState(<div />);
 
         React.useEffect(() => {
           const interval = setInterval(() => {
             axios
-              .get("http://localhost:5000/y")
+              .get("http://localhost:5001/y")
               .then((response) => {
+                console.log(response.data);
+                if (!response.data) {
+                  return;
+                }
+
+                let y = null;
+                if (response.data.y) {
+                  somey = response.data.y.toString();
+                  if (somey.indexOf(",") !== -1) {
+                    ydefkeys = Object.keys(response.data.ydef);
+                    ydefkeys.forEach((ydefkey) => {
+                      ydefval = response.data.ydef[ydefkey].join(",");
+                      if (somey.indexOf(ydefval) !== -1) {
+                        y = ydefkey;
+                      }
+                    });
+                  } else {
+                    y = somey;
+                  }
+                }
+
+                let node = <div></div>;
+                if (y) {
+                  const yval2 = response.data.ydef[y];
+                  if (yval2.length === 2) {
+                    return (
+                      <div>
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: yval2[0] * 600,
+                            top: yval2[1] * 600,
+                            width: 10,
+                            height: 10,
+                            backgroundColor: "green",
+                            borderRadius: 5,
+                          }}
+                        ></div>
+                      </div>
+                    );
+                  } else if (yval2.length === 4) {
+                    return (
+                      <div>
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: yval2[0] * 600,
+                            top: yval2[1] * 600,
+                            width: (yval2[2] - yval2[0]) * 600,
+                            height: (yval2[3] - yval2[1]) * 600,
+                            backgroundColor: "rgba(0, 225, 0, 0.2)",
+                          }}
+                        ></div>
+                      </div>
+                    );
+                  }
+                }
+
+                setCurrentNode(
+                  <div
+                    style={{
+                      width: 600,
+                      height: 600,
+                      position: "relative",
+                      margin: "auto",
+                      backgroundColor: "black",
+                      border: "1px solid white",
+                    }}
+                  >
+                    {Object.keys(response.data.ydef).map((ykey) => {
+                      const yval = response.data.ydef[ykey];
+                      if (yval.length === 2) {
+                        return (
+                          <div>
+                            <div
+                              style={{
+                                position: "absolute",
+                                left: yval[0] * 600,
+                                top: yval[1] * 600,
+                                width: 10,
+                                height: 10,
+                                backgroundColor: "red",
+                                borderRadius: 5,
+                              }}
+                            ></div>
+                          </div>
+                        );
+                      } else if (yval.length === 4) {
+                        return (
+                          <div>
+                            <div
+                              style={{
+                                position: "absolute",
+                                left: yval[0] * 600,
+                                top: yval[1] * 600,
+                                width: (yval[2] - yval[0]) * 600,
+                                height: (yval[3] - yval[1]) * 600,
+                                backgroundColor: "rgba(225, 0, 0, 0.2)",
+                              }}
+                            ></div>
+                          </div>
+                        );
+                      }
+                    })}
+                    {node}
+                  </div>
+                );
+                console.log(response);
                 setCurrentY(response.data);
               })
               .catch((error) => {
@@ -80,9 +189,7 @@
               <Typography variant="h4" component="h1" gutterBottom>
                 Viewer IPS
               </Typography>
-              <Typography variant="h5" component="h2" gutterBottom>
-                Current Position Y : {currentY}
-              </Typography>
+              {currentNode}
             </Stack>
           </Container>
         );

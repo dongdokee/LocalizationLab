@@ -9,7 +9,9 @@ from utils.utils import enumerate_all_data_path, load_data, process_label
 
 def main():
     data_paths = enumerate_all_data_path()
-    label_scan_result_list = [load_data(data_path) for data_path in data_paths]
+    label_scan_result_list = [
+        load_data(data_path) for data_path in data_paths if "bt" in data_path
+    ]
 
     x = []
     y = []

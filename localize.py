@@ -1,6 +1,9 @@
 import argparse
 import asyncio
+import os
 import pickle
+import signal
+import sys
 import threading
 from typing import List
 
@@ -20,14 +23,16 @@ from lab.preprocess import preprocess
 from lib.bt_scan import ScanResult, kill, scan
 
 app = Flask(__name__)
-app.debug = True
 
 current_prediction = {"ydef": y_def.y_def, "y": None}
+
+with open("viewer.html", "r") as f:
+    viewer_html = f.read()
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return app.send_static_file("index.html")
+    return viewer_html
 
 
 @app.route("/y", methods=["GET"])
@@ -50,12 +55,36 @@ async def on_receive_scan_data(scan_result: ScanResult, uuid_list: List[str], mo
     current_prediction["y"] = y
 
 
+def real_main(args, event):
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    with open("uuid_list.pkl", "rb") as f:
+        uuid_list = pickle.load(f)
+
+    model = LocalizationModel.load_model("model.dat")
+
+    async def kill_check():
+        while True:
+            await asyncio.sleep(0.5)
+            if event.is_set():
+                loop.stop()
+
+    loop.create_task(kill_check())
+
+    loop.run_until_complete(
+        scan(args.interval, on_receive_scan_data, uuid_list=uuid_list, model=model)
+    )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="train data sampler", description="트레이닝 데이터를 수집하는 프로그램입니다."
     )
 
-    # parser.add_argument('-t', '--time', type=float, default=10.0, help="측정 시간을 초 단위로 입력하세요. (-t 3이면 3초동안 측정)", required=True)
     parser.add_argument(
         "-i",
         "--interval",
@@ -66,17 +95,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    threading.Thread(target=app.run, kwargs={"host": "localhost", "port": 5001}).start()
+    event = threading.Event()
 
-    loop = asyncio.get_event_loop()
+    def signal_handler(sig, frame):
+        event.set()
+        sys.exit(0)
 
-    with open("uuid_list.pkl", "rb") as f:
-        uuid_list = pickle.load(f)
+    signal.signal(signal.SIGINT, signal_handler)
 
-    model = LocalizationModel.load_model("model.dat")
+    threading.Thread(target=real_main, args=(args, event)).start()
 
-    loop.run_until_complete(
-        scan(args.interval, on_receive_scan_data, uuid_list=uuid_list, model=model)
-    )
-#    await scan_task
-#    pass
+    app.run(host="localhost", port=5001)
