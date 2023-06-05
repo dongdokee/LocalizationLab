@@ -136,7 +136,19 @@
                                 backgroundColor: "red",
                                 borderRadius: 5,
                               }}
-                            ></div>
+                            >
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  bottom: -20,
+                                  left: 0,
+                                  color: "white",
+                                  fontSize: 10,
+                                }}
+                              >
+                                {ykey}
+                              </span>
+                            </div>
                           </div>
                         );
                       } else if (yval.length === 4) {
@@ -151,7 +163,19 @@
                                 height: (yval[3] - yval[1]) * 600,
                                 backgroundColor: "rgba(225, 0, 0, 0.2)",
                               }}
-                            ></div>
+                            >
+                              <span
+                                style={{
+                                  position: "absolute",
+                                  bottom: -20,
+                                  left: 0,
+                                  color: "white",
+                                  fontSize: 10,
+                                }}
+                              >
+                                {ykey}
+                              </span>
+                            </div>
                           </div>
                         );
                       }

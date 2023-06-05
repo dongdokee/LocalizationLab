@@ -45,14 +45,14 @@ def perform_localization(fingerprint: np.ndarray, model):
 
 
 async def on_receive_scan_data(scan_result: ScanResult, uuid_list: List[str], model):
-    # fingerprint = preprocess([scan_result], uuid_list)
+    fingerprint = preprocess([scan_result], uuid_list)
 
-    # y = perform_localization(fingerprint, model)
-    import random
-
-    print("on_receive_scan_data", flush=True)
-
-    y = y_def.y_def[list(y_def.y_def.keys())[random.randint(0, 3)]]
+    y = perform_localization(fingerprint, model)
+    #    import random
+    #
+    #    print("on_receive_scan_data", flush=True)
+    #
+    #    y = y_def.y_def[list(y_def.y_def.keys())[random.randint(0, 3)]]
 
     current_prediction["y"] = y
 
